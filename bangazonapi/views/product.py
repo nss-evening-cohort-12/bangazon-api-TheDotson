@@ -194,8 +194,6 @@ class Products(ViewSet):
         except ValidationError as ex:
             return Response({"message": ex.args[0]}, status=status.HTTP_400_BAD_REQUEST)
 
-        # product.save()
-
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, pk=None):
