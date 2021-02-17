@@ -274,10 +274,17 @@ class Profile(ViewSet):
                 }
             ]
         """
-        customer = Customer.objects.get(user=request.auth.user)
-        favorites = Favorite.objects.filter(customer=customer)
+
+        if request.method == "GET":
+            customer = Customer.objects.get(user=request.auth.user)
+            favorites = Favorite.objects.filter(customer=customer)
+
+            serializer = FavoriteSerializer(
+                favorites, many=True, context={'request': request})
+            return Response(serializer.data)
 
         if request.method == "POST":
+            customer = Customer.objects.get(user=request.auth.user)
             favorite_seller = Favorite()
             favorite_seller.seller = Customer.objects.get(pk=request.data["seller"])
             favorite_seller.customer = customer
@@ -287,11 +294,7 @@ class Profile(ViewSet):
 
             return Response(favorite_seller_json.data)
 
-        serializer = FavoriteSerializer(
-            favorites, many=True, context={'request': request})
-        return Response(serializer.data)
-
-    return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class LineItemSerializer(serializers.HyperlinkedModelSerializer):
