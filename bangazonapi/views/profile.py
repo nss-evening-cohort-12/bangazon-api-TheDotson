@@ -291,7 +291,7 @@ class Profile(ViewSet):
             favorites, many=True, context={'request': request})
         return Response(serializer.data)
 
-        return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class LineItemSerializer(serializers.HyperlinkedModelSerializer):
