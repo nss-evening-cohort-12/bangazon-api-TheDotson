@@ -8,9 +8,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import serializers
 from rest_framework import status
-from bangazonapi.models import Product, Customer, ProductCategory, Like
+from bangazonapi.models import Product, Customer, ProductCategory, Like, ProductRating
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.contrib.auth.models import User
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -23,11 +24,19 @@ class ProductSerializer(serializers.ModelSerializer):
         depth = 1
 
 class LikeSerializer(serializers.ModelSerializer):
-    """Json seriaalizer for Likes"""
+    """JSON serializer for Likes"""
 
     class Meta:
         model = Like
         fields = ('id', 'product')
+        depth = 1
+
+class RatingSerializer(serializers.ModelSerializer):
+    """JSON serializer for Ratings"""
+
+    class Meta:
+        model = ProductRating
+        fields = ('id', 'rating', 'customer', 'product')
         depth = 1
 
 class Products(ViewSet):
@@ -163,6 +172,8 @@ class Products(ViewSet):
         """
         try:
             product = Product.objects.get(pk=pk)
+            customer = Customer.objects.get(user=request.auth.user)
+            product.can_be_rated = not ProductRating.objects.filter(customer=customer, product=product).exists()
             serializer = ProductSerializer(product, context={'request': request})
             return Response(serializer.data)
         except Product.DoesNotExist as ex:
@@ -342,3 +353,20 @@ class Products(ViewSet):
                 return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
 
             return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+    @action(methods=['post'], detail=True)
+    def rating(self, request, pk=None):
+        customer = Customer.objects.get(user=request.auth.user)
+        product = Product.objects.get(pk=pk)
+
+        if request.method == 'POST':
+            new_rating = ProductRating()
+            new_rating.rating = request.data['rating']
+            new_rating.product = product
+            new_rating.customer = customer
+            new_rating.save()
+
+            serializer = RatingSerializer(
+                new_rating, many=False, context={'request': request}
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
