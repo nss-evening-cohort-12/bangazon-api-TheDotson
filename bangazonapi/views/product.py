@@ -37,7 +37,6 @@ class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductRating
         fields = ('id', 'rating', 'customer', 'product')
-        depth = 1
 
 class Products(ViewSet):
     """Request handlers for Products in the Bangazon Platform"""
