@@ -171,8 +171,6 @@ class Products(ViewSet):
         """
         try:
             product = Product.objects.get(pk=pk)
-            customer = Customer.objects.get(user=request.auth.user)
-            product.can_be_rated = not ProductRating.objects.filter(customer=customer, product=product).exists()
             serializer = ProductSerializer(product, context={'request': request})
             return Response(serializer.data)
         except Product.DoesNotExist as ex:
