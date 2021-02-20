@@ -1,0 +1,40 @@
+  
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Expensive Products</title>
+    <style>
+      table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+      
+      td, th {
+        border: 1px solid #000000;
+        text-align: left;
+        padding: 4px;
+      }
+      
+      tr:nth-child(even) {
+        background-color: #858b97;
+      }
+    </style>
+  </head>
+  <body>
+      <table style="width:75%; margin: 0 auto;">
+          <tr>
+              <th>Product</th>
+              <th>Price</th>
+          </tr>
+          {% for product in expensive_products %}
+          <tr>
+              <td>{{product.name}}</td>
+              <td>{{product.price}}</td>
+          </tr>
+          {% endfor %}
+      </table>
+  </body>
+</html>
