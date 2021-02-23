@@ -1,0 +1,39 @@
+  
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>User's Favorite Sellers</title>
+    <style>
+      table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+      }
+      
+      td, th {
+        border: 1px solid #000000;
+        text-align: left;
+        padding: 4px;
+      }
+      
+      tr:nth-child(even) {
+        background-color: #858b97;
+      }
+    </style>
+  </head>
+  <body>
+      {% for buyer in favorite_sellers %}
+        <table style="width:25%; margin: 10px auto 0px auto; border: 2px solid black;">
+          <tr>
+              <th>{{buyer.Name}}</th>
+          </tr>
+          {% for seller in buyer.Favorites %}
+          <tr>
+              <td>{{seller}}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      {% endfor %}
+  </body>
+</html>
