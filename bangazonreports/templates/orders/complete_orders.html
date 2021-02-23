@@ -1,0 +1,44 @@
+  
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Completed Orders</title>
+    <style>
+      table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+      
+      td, th {
+        border: 1px solid #000000;
+        text-align: left;
+        padding: 4px;
+      }
+      
+      tr:nth-child(even) {
+        background-color: #858b97;
+      }
+    </style>
+  </head>
+  <body>
+      <table style="width:75%; margin: 0 auto;">
+          <tr>
+              <th>Order ID</th>
+              <th>Customer Name</th>
+              <th>Total Price</th>
+              <th>Payment Type</th>
+          </tr>
+          {% for order in completed_orders %}
+          <tr>
+              <td>{{order.id}}</td>
+              <td>{{order.full_name}}</td>
+              <td>{{order.total_price}}</td>
+              <td>{{order.payment_type}}</td>
+          </tr>
+          {% endfor %}
+      </table>
+  </body>
+</html>

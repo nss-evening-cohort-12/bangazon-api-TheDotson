@@ -1,8 +1,6 @@
 import sqlite3
 from django.shortcuts import render
-from bangazonapi.models import Order
 from bangazonreports.views import Connection
-
 
 def incomplete_orders(request):
     if request.method == 'GET':
@@ -11,35 +9,33 @@ def incomplete_orders(request):
             db_cursor = conn.cursor()
 
             db_cursor.execute("""
-                SELECT 
-                  o.id order_id,
-                  SUM(pr.price) total_price, a.first_name || ' ' || a.last_name AS full_name
+                SELECT
+                  o.id as 'order',
+                  u.first_name || ' ' || u.last_name as 'full name',
+                  SUM(price) as 'total price'
 
                 FROM bangazonapi_order o
-                JOIN bangazonapi_orderproduct op
-                ON o.id = op.order_id
-                JOIN bangazonapi_product pr 
-                ON op.product_id = pr.id
-                JOIN bangazonapi_customer c 
-                ON o.customer_id = c.id 
-                JOIN auth_user a
-                ON c.user_id = a.id
-                WHERE o.payment_type_id IS NULL
+                JOIN bangazonapi_customer c ON o.customer_id = c.id
+                JOIN auth_user u ON u.id = c.user_id
+                JOIN bangazonapi_orderproduct op ON op.order_id = o.id
+                JOIN bangazonapi_product p ON p.id = op.product_id
+                WHERE payment_type_id IS NULL
                 GROUP BY o.id
-            """)
+                """)
 
             dataset = db_cursor.fetchall()
 
-            order_list = {}
+            incomplete_orders = []
 
             for row in dataset:
-              order = Order()
-              order_id = row["order_id"]
-              full_name = row["full_name"]
-              price = row["total_price"]
-              order_list.append(product)
+                order = {
+                  'order_id': row['order'],
+                  'full_name': row['full name'],
+                  'total_price': row['total price']
+                }
+                incomplete_orders.append(order)
 
         template = 'orders/incomplete_orders.html'
-        context = {'incomplete_orders': order_list}
+        context = {'incomplete_orders': incomplete_orders}
 
         return render(request, template, context)
